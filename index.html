@@ -5,89 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Adlightenment: Путь к Просвещению</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Base styles for disabling user interaction and ensuring layout stability */
         html, body {
             height: 100%;
             width: 100%;
             overflow: hidden;
-            position: fixed; /* Prevents any kind of scrolling */
+            position: fixed;
         }
         body {
             font-family: 'Inter', sans-serif;
-            touch-action: manipulation; /* Disables double-tap zoom */
-            user-select: none; /* Disables text selection */
+            touch-action: manipulation;
+            user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
         }
-        .font-orbitron {
-            font-family: 'Orbitron', sans-serif;
-        }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
         .btn-shine {
             background: linear-gradient(45deg, #fca5a5, #f87171, #ef4444, #dc2626, #b91c1c);
             background-size: 400% 400%;
             animation: gradient-animation 10s ease infinite;
             transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
         }
-        .btn-shine:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.7);
-        }
-        .btn-shine:active {
-            transform: scale(0.98);
-        }
+        .btn-shine:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(239, 68, 68, 0.7); }
+        .btn-shine:active { transform: scale(0.98); }
         @keyframes gradient-animation {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        .wisdom-aura {
-            box-shadow: 0 0 35px rgba(59, 130, 246, 0.6), 0 0 15px rgba(59, 130, 246, 0.8) inset;
-        }
-        .modal-backdrop {
-            background-color: rgba(0, 0, 0, 0.75);
-            transition: opacity 0.3s ease;
-        }
-        .modal-content {
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            transform: translateY(-20px) scale(0.95);
-            opacity: 0;
-        }
-        .modal-visible .modal-content {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-        }
-        .fade-in-out {
-            animation: fadeInOut 2s forwards;
-        }
+        .wisdom-aura { box-shadow: 0 0 35px rgba(59, 130, 246, 0.6), 0 0 15px rgba(59, 130, 246, 0.8) inset; }
+        .modal-backdrop { background-color: rgba(0, 0, 0, 0.75); transition: opacity 0.3s ease; }
+        .modal-content { transition: transform 0.3s ease, opacity 0.3s ease; transform: translateY(-20px) scale(0.95); opacity: 0; }
+        .modal-visible .modal-content { transform: translateY(0) scale(1); opacity: 1; }
+        .fade-in-out { animation: fadeInOut 2s forwards; }
         @keyframes fadeInOut {
             0% { opacity: 0; transform: translateY(0) scale(0.8); }
             25% { opacity: 1; transform: translateY(-30px) scale(1); }
             75% { opacity: 1; transform: translateY(-40px) scale(1); }
             100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
         }
-        
-        /* Tutorial Highlighter */
-        #tutorial-highlighter {
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75);
-            z-index: 9998;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        #tutorial-content-box {
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        #tutorial-highlighter { box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75); z-index: 9998; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #tutorial-content-box { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+            0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); }
         }
-        .shake {
-            animation: shake 0.3s linear;
-        }
+        .shake { animation: shake 0.3s linear; }
+        #banner-container { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; }
     </style>
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center">
@@ -115,12 +83,12 @@
                 <p id="useless-clicks-display" class="text-base sm:text-xl font-bold font-orbitron text-white">0</p>
             </div>
             <div id="level-stats" class="col-span-3 bg-gray-900/50 p-2 sm:p-3 rounded-lg border border-gray-700">
-                <p class="text-blue-300/70">Уровень / Титул™:</p>
+                <p class="text-blue-300/70">Уровень™:</p>
                 <p id="level-display" class="text-sm sm:text-lg font-bold text-yellow-300">Глиста Знаний</p>
             </div>
         </div>
 
-        <!-- Progress Bar (Просветометр™) -->
+        <!-- Progress Bar -->
         <div id="progress-bar-container" class="mb-4 sm:mb-6">
             <div class="flex justify-between items-center text-xs text-blue-300/70 mb-1">
                 <span>Просветометр™</span>
@@ -133,103 +101,88 @@
 
         <!-- Main Clicker Button Area -->
         <div class="flex-grow flex items-center justify-center relative">
-             <div id="ep-animation-container" class="absolute inset-0 flex items-center justify-center pointer-events-none"></div>
-            <button id="enlighten-button" class="w-36 h-36 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full btn-shine text-white font-bold text-xl sm:text-2xl md:text-3xl shadow-lg flex items-center justify-center text-center leading-tight p-2 z-10">
-                ПРОСВЕТИТЬСЯ!
-            </button>
-            <button id="useless-clicker-btn" class="absolute w-16 h-16 sm:w-20 sm:h-20 bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 rounded-full text-gray-900 font-bold text-lg flex items-center justify-center z-20 transition-transform active:scale-95" style="top: -15px; left: 15%;">
-                ЖАТЬ
-            </button>
+            <div id="ep-animation-container" class="absolute inset-0 flex items-center justify-center pointer-events-none"></div>
+            <!-- Action Buttons Container -->
+            <div class="relative w-36 h-36 sm:w-48 sm:h-48 md:w-56 md:h-56 flex items-center justify-center">
+                <button id="shop-button" class="absolute text-yellow-300 bg-gray-700/80 rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center text-xl font-bold hover:bg-gray-600 transition z-20" style="left: -40px; top: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" /></svg>
+                </button>
+                <button id="enlighten-button" class="w-full h-full rounded-full btn-shine text-white font-bold text-xl sm:text-2xl md:text-3xl shadow-lg flex items-center justify-center text-center leading-tight p-2 z-10">
+                    ПРОСВЕТИТЬСЯ!
+                </button>
+                <button id="useless-clicker-btn" class="absolute w-16 h-16 sm:w-20 sm:h-20 bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 rounded-full text-gray-900 font-bold text-lg flex items-center justify-center z-20 transition-transform active:scale-95" style="left: -60px; bottom: -10px;">
+                    ЖАТЬ
+                </button>
+            </div>
         </div>
         
         <!-- Corner Buttons -->
-        <button id="shop-button" class="absolute top-2 left-2 sm:top-4 sm:left-4 text-yellow-300 bg-gray-700/50 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-lg sm:text-xl font-bold hover:bg-gray-600 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" /></svg>
-        </button>
         <button id="journal-button" class="absolute top-2 right-2 sm:top-4 sm:right-4 text-blue-300 bg-gray-700/50 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-lg sm:text-xl font-bold hover:bg-gray-600 transition">
             i
         </button>
 
         <!-- Footer -->
-        <footer class="mt-2 sm:mt-4 text-center">
+        <footer class="mt-2 sm:mt-4 text-center pb-12"> <!-- Padding bottom for banner -->
             <p class="text-gray-500 text-[10px] sm:text-xs px-4">
                 Продолжая, вы соглашаетесь с тем, что Просвещение™ — это весело, а ваше время безжалостно тратится.
             </p>
         </footer>
     </div>
     
-    <!-- Tutorial Highlighter -->
+    <div id="banner-container"></div>
     <div id="tutorial-highlighter" class="hidden absolute border-4 border-yellow-400 rounded-lg pointer-events-none"></div>
 
     <!-- Modals -->
-    <!-- Ad Simulation Modal -->
     <div id="ad-modal" class="fixed inset-0 flex items-center justify-center modal-backdrop hidden z-40">
         <div class="bg-gray-800 p-8 rounded-lg shadow-xl text-center border border-blue-500/30">
-            <h3 class="text-2xl font-bold mb-4 text-blue-300">Просмотр Рекламы™...</h3>
-            <p class="mb-4">Пожалуйста, подождите, идет процесс Просвещения.</p>
+            <h3 class="text-2xl font-bold mb-4 text-blue-300">Просвещение...</h3>
             <div class="w-full bg-gray-700 rounded-full h-2.5">
-                <div id="ad-progress" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                <div id="ad-progress" class="bg-blue-600 h-2.5 rounded-full"></div>
             </div>
         </div>
     </div>
-    <!-- Journal Modal -->
+    <div id="shop-modal" class="fixed inset-0 p-4 flex items-center justify-center modal-backdrop hidden z-50">
+        <div class="modal-content bg-gray-800 max-w-md w-full p-6 rounded-2xl shadow-xl border border-purple-400/30 relative">
+            <h3 class="text-2xl font-bold mb-4 text-purple-300 font-orbitron">Магазин Уровней™</h3>
+            <div id="shop-items-container" class="space-y-3 max-h-[60vh] overflow-y-auto"></div>
+            <button onclick="closeModal('shop-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+    <!-- Other modals remain the same -->
     <div id="journal-modal" class="fixed inset-0 p-4 flex items-center justify-center modal-backdrop hidden z-50">
         <div class="modal-content bg-gray-800 max-w-md w-full p-6 rounded-2xl shadow-xl border border-yellow-400/30 relative">
             <h3 class="text-2xl font-bold mb-4 text-yellow-300 font-orbitron">Исследовательский Журнал™</h3>
             <ul class="space-y-3 text-gray-300">
-                <li>"<b>Средняя скорость накопления ЕП™:</b> 42 ЕП/час (зависит от длины рекламы)."</li>
+                <li>"<b>Средняя скорость накопления ЕП™:</b> зависит от щедрости рекламодателей."</li>
                 <li>"<b>Рекомендуемая доза Просвещения™:</b> 30 реклам в день для устойчивого роста."</li>
-                <li>"<b>Ваши ЕП™ выше,</b> чем у 78% пользователей в вашем часовом поясе (данные приблизительны и мотивирующи)."</li>
+                <li>"<b>Ваши ЕП™ выше,</b> чем у 78% пользователей в вашем часовом поясе."</li>
             </ul>
-            <button onclick="closeModal('journal-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
+            <button onclick="closeModal('journal-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
     </div>
-    <!-- Shop Modal -->
-    <div id="shop-modal" class="fixed inset-0 p-4 flex items-center justify-center modal-backdrop hidden z-50">
-        <div class="modal-content bg-gray-800 max-w-md w-full p-6 rounded-2xl shadow-xl border border-purple-400/30 relative">
-            <h3 class="text-2xl font-bold mb-4 text-purple-300 font-orbitron">Магазин Титулов™</h3>
-            <div id="shop-items-container" class="space-y-3 max-h-[60vh] overflow-y-auto">
-                <!-- Shop items will be injected here -->
-            </div>
-            <button onclick="closeModal('shop-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-        </div>
-    </div>
-    <!-- Level Up Modal & Diploma Modal remain the same -->
     <div id="levelup-modal" class="fixed inset-0 p-4 flex items-center justify-center modal-backdrop hidden z-50">
         <div class="modal-content bg-gray-800 max-w-md w-full p-8 rounded-2xl shadow-xl border border-green-400/30 text-center relative">
             <h3 class="text-3xl font-bold mb-2 text-green-300 font-orbitron">УРОВЕНЬ ПОВЫШЕН!</h3>
-            <p class="text-lg mb-4">Поздравляем! Вы теперь:</p>
-            <p id="new-level-name" class="text-2xl font-bold text-yellow-300 mb-6"></p>
+            <p class="text-lg mb-4">Поздравляем! Вы теперь:</p><p id="new-level-name" class="text-2xl font-bold text-yellow-300 mb-6"></p>
             <button onclick="closeModal('levelup-modal')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition">Отлично!</button>
         </div>
     </div>
     <div id="diploma-modal" class="fixed inset-0 p-4 flex items-center justify-center modal-backdrop hidden z-50">
         <div class="modal-content bg-gray-100 text-gray-800 max-w-lg w-full p-8 rounded-lg shadow-xl border-4 border-yellow-500 relative" style="background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');">
             <h2 class="text-center text-4xl font-bold text-yellow-800 mb-4" style="font-family: 'Times New Roman', serif;">Диплом Просвещения™</h2>
-            <p class="text-center text-lg mb-6">Сертифицировано, что пользователь достиг наивысшей степени <b>Adlightenment™</b> путем добросовестного просмотра <b id="diploma-ad-count">N</b> рекламных роликов и демонстрации невероятной выдержки и открытости к коммерческому знанию.</p>
-            <p class="text-center text-xl font-bold text-red-800">Право носить титул</p>
-            <p class="text-center text-3xl font-bold text-red-800 mb-8">Верховного Гуру Рекламной Вселенной™</p>
-            <p class="text-center text-lg">подтверждается.</p>
-            <button onclick="closeModal('diploma-modal')" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800">
-                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
+            <p class="text-center text-lg mb-6">Сертифицировано, что пользователь достиг наивысшей степени <b>Adlightenment™</b> путем добросовестного просмотра <b id="diploma-ad-count">N</b> рекламных роликов.</p>
+            <p class="text-center text-xl font-bold text-red-800">Право носить титул</p><p class="text-center text-3xl font-bold text-red-800 mb-8">Верховного Гуру Рекламной Вселенной™</p><p class="text-center text-lg">подтверждается.</p>
+            <button onclick="closeModal('diploma-modal')" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
         </div>
     </div>
-    
-    <!-- Tutorial Modal -->
     <div id="tutorial-modal" class="fixed inset-0 p-4 flex items-center justify-center modal-backdrop hidden z-[9999]">
         <div id="tutorial-content-box" class="absolute modal-content bg-gray-800 max-w-xs w-full p-5 rounded-2xl shadow-xl border border-yellow-400/30 flex flex-col min-h-[150px]">
             <div id="tutorial-text-container" class="flex-grow"></div>
-            <div class="mt-auto pt-4 flex justify-end items-center">
-                <button id="tutorial-next-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-5 rounded-lg transition">Далее</button>
-            </div>
+            <div class="mt-auto pt-4 flex justify-end items-center"><button id="tutorial-next-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-5 rounded-lg transition">Далее</button></div>
         </div>
     </div>
-
 
     <script>
         // --- DOM Elements ---
@@ -256,13 +209,12 @@
             adsWatched: 0,
             currentLevelIndex: 0,
             uselessClicks: 0,
-            purchasedTitles: [],
-            equippedTitle: null,
         };
 
         // --- Game Configuration ---
         const EP_PER_AD = 10;
-        const AD_DURATION_MS = 1000; // 1 second for simulation
+        const AD_SIMULATION_DURATION_MS = 100; // 0.1 second
+        const VK_STORAGE_KEY = 'adlightenmentGameState';
         const LEVELS = [
             { name: "Глиста Знаний", epRequired: 0 },
             { name: "Юный Пониматель Слоганов", epRequired: 50 },
@@ -271,42 +223,104 @@
             { name: "Просветленный Консультант по Таргету", epRequired: 1000 },
             { name: "Верховный Гуру Рекламной Вселенной™", epRequired: 5000 },
         ];
-        const SHOP_ITEMS = [
-            { id: 'title1', name: 'Повелитель Баннеров', price: 200, description: 'Внушает трепет всплывающим окнам.' },
-            { id: 'title2', name: 'Адепт Контекста', price: 750, description: 'Видит скрытые смыслы в cookie-файлах.' },
-            { id: 'title3', name: 'Лорд-Коммандер Ретаргетинга', price: 2500, description: 'От него не скрыться.' }
-        ];
-
-        // --- Tutorial Configuration ---
         const TUTORIAL_STEPS = [
-            { title: "Добро пожаловать!", text: "Представляем революционный метод познания! Готовьтесь к погружению в шедевры маркетинговой мысли.", highlight: null },
+            { title: "Добро пожаловать!", text: "Представляем революционный метод познания!", highlight: null },
             { title: "Смотрите Рекламу™", text: "Нажмите эту Великую Кнопку, чтобы запустить процесс Просвещения.", highlight: '#enlighten-button' },
             { title: "Получайте Просвещение™", text: "Каждая реклама наполняет мозг 'Единицами Просвещения' (ЕП™).", highlight: '#ep-stats' },
-            { title: "Покупайте Титулы™", text: "В магазине можно потратить ЕП™ на эксклюзивные титулы для демонстрации своего статуса.", highlight: '#shop-button' },
+            { title: "Покупайте Уровни™", text: "В магазине можно потратить ЕП™ на мгновенное повышение своего статуса.", highlight: '#shop-button' },
             { title: "Достигайте Вершин", text: "Накопите ЕП™, чтобы подняться по Лестнице Интеллекта™!", highlight: '#level-stats' },
         ];
         let currentTutorialStep = 0;
 
+        // --- VK Bridge Functions ---
+        async function saveData() {
+            try {
+                await vkBridge.send('VKWebAppStorageSet', {
+                    key: VK_STORAGE_KEY,
+                    value: JSON.stringify(gameState)
+                });
+            } catch (error) {
+                console.error('Failed to save data:', error);
+            }
+        }
+
+        async function loadData() {
+            try {
+                const data = await vkBridge.send('VKWebAppStorageGet', { keys: [VK_STORAGE_KEY] });
+                if (data.keys[0].value) {
+                    gameState = { ...gameState, ...JSON.parse(data.keys[0].value) };
+                }
+            } catch (error) {
+                console.error('Failed to load data:', error);
+            } finally {
+                updateUI();
+            }
+        }
+
+        function showBannerAd() {
+            vkBridge.send('VKWebAppShowBannerAd', { banner_location: 'bottom' })
+                .catch(error => console.error('Banner ad error:', error));
+        }
+
+        async function showRewardedAd() {
+            enlightenButton.disabled = true;
+            enlightenButton.classList.add('opacity-50', 'cursor-not-allowed');
+            try {
+                const data = await vkBridge.send('VKWebAppShowNativeAds', { ad_format: 'reward' });
+                if (data.result === true) {
+                    // Ad watched successfully, grant reward
+                    gameState.enlightenmentPoints += EP_PER_AD;
+                    gameState.adsWatched++;
+                    showEpAnimation();
+                    checkLevelUp();
+                    updateUI();
+                    await saveData();
+                }
+            } catch (error) {
+                console.error('Rewarded ad error:', error);
+                // In case of error (e.g., no ads available), simulate a quick reward
+                runAdSimulation();
+            } finally {
+                enlightenButton.disabled = false;
+                enlightenButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+        
+        // Fallback for when VK Ads fail or for testing
+        function runAdSimulation() {
+            openModal('ad-modal');
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                adProgress.style.width = `${progress}%`;
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    closeModal('ad-modal');
+                    adProgress.style.width = '0%';
+                    gameState.enlightenmentPoints += EP_PER_AD;
+                    gameState.adsWatched++;
+                    showEpAnimation();
+                    checkLevelUp();
+                    updateUI();
+                    saveData();
+                }
+            }, AD_SIMULATION_DURATION_MS / 10);
+        }
+
         // --- Game Logic ---
         function updateUI() {
-            const currentLevel = LEVELS[gameState.currentLevelIndex];
-            const nextLevel = LEVELS[gameState.currentLevelIndex + 1];
-
+            levelDisplay.textContent = LEVELS[gameState.currentLevelIndex].name;
             epDisplay.textContent = gameState.enlightenmentPoints;
             adsDisplay.textContent = gameState.adsWatched;
             uselessClicksDisplay.textContent = gameState.uselessClicks;
-            levelDisplay.textContent = gameState.equippedTitle || currentLevel.name;
-
+            const nextLevel = LEVELS[gameState.currentLevelIndex + 1];
             if (nextLevel) {
-                const epForNextLevel = nextLevel.epRequired - currentLevel.epRequired;
-                const epProgress = gameState.enlightenmentPoints - currentLevel.epRequired;
-                const progressPercentage = Math.min((epProgress / epForNextLevel) * 100, 100);
-                progressBar.style.width = `${progressPercentage}%`;
+                const epForNext = nextLevel.epRequired - LEVELS[gameState.currentLevelIndex].epRequired;
+                const epProgress = gameState.enlightenmentPoints - LEVELS[gameState.currentLevelIndex].epRequired;
+                progressBar.style.width = `${Math.min((epProgress / epForNext) * 100, 100)}%`;
                 nextLevelReqDisplay.textContent = `След: ${nextLevel.epRequired} ЕП™`;
             } else {
                 progressBar.style.width = '100%';
-                progressBar.classList.remove('from-blue-500', 'to-cyan-400');
-                progressBar.classList.add('from-yellow-400', 'to-orange-500');
                 nextLevelReqDisplay.textContent = "Вершина достигнута!";
             }
         }
@@ -333,174 +347,97 @@
             epAnimationContainer.appendChild(anim);
             setTimeout(() => anim.remove(), 2000);
         }
-
-        function handleEnlightenClick() {
-            enlightenButton.disabled = true;
-            enlightenButton.classList.add('opacity-50', 'cursor-not-allowed');
-            openModal('ad-modal');
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 10;
-                adProgress.style.width = `${progress}%`;
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    closeModal('ad-modal');
-                    adProgress.style.width = '0%';
-                    gameState.enlightenmentPoints += EP_PER_AD;
-                    gameState.adsWatched++;
-                    showEpAnimation();
-                    checkLevelUp();
-                    updateUI();
-                    enlightenButton.disabled = false;
-                    enlightenButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                }
-            }, AD_DURATION_MS / 10);
-        }
         
         function handleUselessClick() {
             gameState.uselessClicks++;
             updateUI();
+            saveData();
         }
 
         // --- Shop Logic ---
         function openShop() {
             const container = document.getElementById('shop-items-container');
-            container.innerHTML = ''; // Clear previous items
-
-            SHOP_ITEMS.forEach(item => {
-                const isPurchased = gameState.purchasedTitles.includes(item.id);
-                const canAfford = gameState.enlightenmentPoints >= item.price;
-
+            container.innerHTML = '';
+            LEVELS.forEach((level, index) => {
+                if (index === 0) return; // Don't show the first level
+                const isUnlocked = gameState.currentLevelIndex >= index;
+                const canAfford = gameState.enlightenmentPoints >= level.epRequired;
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'bg-gray-900/50 p-3 rounded-lg flex items-center justify-between';
-                
-                let buttonHtml;
-                if (isPurchased) {
-                    buttonHtml = `<button class="bg-gray-600 text-gray-400 text-sm font-bold py-2 px-4 rounded-lg cursor-not-allowed">Куплено</button>`;
-                } else {
-                    buttonHtml = `<button onclick="buyItem('${item.id}', this)" class="${canAfford ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-700 text-gray-400 cursor-not-allowed'} text-white text-sm font-bold py-2 px-4 rounded-lg transition">Купить</button>`;
-                }
-
-                itemDiv.innerHTML = `
-                    <div>
-                        <h4 class="font-bold text-purple-300">${item.name}</h4>
-                        <p class="text-xs text-gray-400">${item.description}</p>
-                        <p class="text-sm font-bold text-yellow-400">${item.price} ЕП™</p>
-                    </div>
-                    ${buttonHtml}
-                `;
+                let buttonHtml = isUnlocked
+                    ? `<button class="bg-gray-600 text-gray-400 text-sm font-bold py-2 px-4 rounded-lg cursor-not-allowed">Достигнут</button>`
+                    : `<button onclick="buyLevel(${index}, this)" class="${canAfford ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-700 text-gray-400 cursor-not-allowed'} text-white text-sm font-bold py-2 px-4 rounded-lg transition">Купить</button>`;
+                itemDiv.innerHTML = `<div><h4 class="font-bold text-purple-300">${level.name}</h4><p class="text-sm font-bold text-yellow-400">${level.epRequired} ЕП™</p></div>${buttonHtml}`;
                 container.appendChild(itemDiv);
             });
             openModal('shop-modal');
         }
 
-        function buyItem(itemId, buttonElement) {
-            const item = SHOP_ITEMS.find(i => i.id === itemId);
-            if (!item || gameState.purchasedTitles.includes(itemId)) return;
-
-            if (gameState.enlightenmentPoints >= item.price) {
-                gameState.enlightenmentPoints -= item.price;
-                gameState.purchasedTitles.push(itemId);
-                gameState.equippedTitle = item.name;
+        function buyLevel(levelIndex, buttonElement) {
+            const level = LEVELS[levelIndex];
+            if (!level || gameState.currentLevelIndex >= levelIndex) return;
+            if (gameState.enlightenmentPoints >= level.epRequired) {
+                gameState.enlightenmentPoints = level.epRequired;
+                gameState.currentLevelIndex = levelIndex;
                 updateUI();
-                openShop(); // Refresh shop to show purchased status
+                saveData();
+                closeModal('shop-modal');
             } else {
-                // Not enough points, shake the button
                 buttonElement.classList.add('shake');
                 setTimeout(() => buttonElement.classList.remove('shake'), 300);
             }
         }
 
-        // --- Modal Logic ---
-        function openModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.classList.remove('hidden');
-                setTimeout(() => modal.classList.add('modal-visible'), 10);
-            }
-        }
-
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.classList.remove('modal-visible');
-                setTimeout(() => modal.classList.add('hidden'), 300);
-            }
-        }
-        
-        // --- Tutorial Logic ---
-        function showTutorialStep(stepIndex) {
-            const step = TUTORIAL_STEPS[stepIndex];
+        // --- Modal & Tutorial Logic ---
+        function openModal(id) { const el = document.getElementById(id); if(el) { el.classList.remove('hidden'); setTimeout(() => el.classList.add('modal-visible'), 10); } }
+        function closeModal(id) { const el = document.getElementById(id); if(el) { el.classList.remove('modal-visible'); setTimeout(() => el.classList.add('hidden'), 300); } }
+        function showTutorialStep(idx) {
+            const step = TUTORIAL_STEPS[idx];
             document.getElementById('tutorial-text-container').innerHTML = `<h3 class="text-lg sm:text-xl font-bold mb-2 text-yellow-300 font-orbitron">${step.title}</h3><p class="text-sm sm:text-base text-gray-300">${step.text}</p>`;
-
             if (step.highlight) {
                 const el = document.querySelector(step.highlight);
                 const rect = el.getBoundingClientRect();
                 tutorialHighlighter.classList.remove('hidden');
                 Object.assign(tutorialHighlighter.style, { top: `${rect.top - 5}px`, left: `${rect.left - 5}px`, width: `${rect.width + 10}px`, height: `${rect.height + 10}px` });
-                
-                const spaceBelow = window.innerHeight - rect.bottom;
-                const modalHeight = tutorialContentBox.offsetHeight;
+                const spaceBelow = window.innerHeight - rect.bottom, modalHeight = tutorialContentBox.offsetHeight;
                 tutorialContentBox.style.top = (spaceBelow > modalHeight + 20) ? `${rect.bottom + 15}px` : `${rect.top - modalHeight - 15}px`;
                 let modalLeft = rect.left + rect.width / 2 - tutorialContentBox.offsetWidth / 2;
-                modalLeft = Math.max(10, Math.min(modalLeft, window.innerWidth - tutorialContentBox.offsetWidth - 10));
-                tutorialContentBox.style.left = `${modalLeft}px`;
+                tutorialContentBox.style.left = `${Math.max(10, Math.min(modalLeft, window.innerWidth - tutorialContentBox.offsetWidth - 10))}px`;
             } else {
                 tutorialHighlighter.classList.add('hidden');
                 Object.assign(tutorialContentBox.style, { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' });
             }
-            document.getElementById('tutorial-next-btn').textContent = (stepIndex === TUTORIAL_STEPS.length - 1) ? 'Начать Просвещение!' : 'Далее';
+            document.getElementById('tutorial-next-btn').textContent = (idx === TUTORIAL_STEPS.length - 1) ? 'Начать!' : 'Далее';
         }
-
         function handleTutorialNext() {
             currentTutorialStep++;
-            if (currentTutorialStep < TUTORIAL_STEPS.length) {
-                showTutorialStep(currentTutorialStep);
-            } else {
-                closeModal('tutorial-modal');
-                tutorialHighlighter.classList.add('hidden');
-                localStorage.setItem('adlightenmentTutorialCompleted', 'true');
-            }
+            if (currentTutorialStep < TUTORIAL_STEPS.length) showTutorialStep(currentTutorialStep);
+            else { closeModal('tutorial-modal'); tutorialHighlighter.classList.add('hidden'); saveData(); }
         }
 
-        // --- Event Listeners ---
-        enlightenButton.addEventListener('click', handleEnlightenClick);
-        uselessClickerBtn.addEventListener('click', handleUselessClick);
-        journalButton.addEventListener('click', () => openModal('journal-modal'));
-        shopButton.addEventListener('click', openShop);
-        
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                ['journal-modal', 'levelup-modal', 'diploma-modal', 'shop-modal'].forEach(closeModal);
-            }
-        });
-        
-        document.querySelectorAll('.modal-backdrop:not(#tutorial-modal)').forEach(backdrop => {
-            backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(backdrop.id); });
-        });
-        
-        window.addEventListener('contextmenu', e => e.preventDefault());
+        // --- Event Listeners & Initialization ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            await vkBridge.send('VKWebAppInit');
+            await loadData();
+            showBannerAd();
 
-        // --- Initialization ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedState = localStorage.getItem('adlightenmentGameState');
-            if (savedState) {
-                gameState = { ...gameState, ...JSON.parse(savedState) };
-            }
+            enlightenButton.addEventListener('click', showRewardedAd);
+            uselessClickerBtn.addEventListener('click', handleUselessClick);
+            journalButton.addEventListener('click', () => openModal('journal-modal'));
+            shopButton.addEventListener('click', openShop);
 
-            window.addEventListener('beforeunload', () => {
-                localStorage.setItem('adlightenmentGameState', JSON.stringify(gameState));
-            });
-
-            updateUI();
-
-            const tutorialCompleted = localStorage.getItem('adlightenmentTutorialCompleted');
-            if (!tutorialCompleted) {
+            if (!gameState.tutorialCompleted) {
                 openModal('tutorial-modal');
-                setTimeout(() => showTutorialStep(0), 50); 
-                document.getElementById('tutorial-next-btn').addEventListener('click', handleTutorialNext);
+                setTimeout(() => showTutorialStep(0), 50);
+                document.getElementById('tutorial-next-btn').addEventListener('click', () => {
+                    gameState.tutorialCompleted = true;
+                    handleTutorialNext();
+                });
             }
         });
+        window.addEventListener('contextmenu', e => e.preventDefault());
+        window.addEventListener('keydown', (e) => { if (e.key === 'Escape') ['journal-modal', 'levelup-modal', 'diploma-modal', 'shop-modal'].forEach(closeModal); });
+        document.querySelectorAll('.modal-backdrop:not(#tutorial-modal)').forEach(b => b.addEventListener('click', (e) => { if (e.target === b) closeModal(b.id); }));
     </script>
 </body>
 </html>
