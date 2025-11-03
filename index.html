@@ -209,6 +209,8 @@
             adsWatched: 0,
             currentLevelIndex: 0,
             uselessClicks: 0,
+            notificationAskAttempts: 0, // Отслеживаем попытки
+            tutorialCompleted: false // Отслеживаем обучение
         };
 
         // --- Game Configuration ---
@@ -358,33 +360,73 @@
         function openShop() {
             const container = document.getElementById('shop-items-container');
             container.innerHTML = '';
+            
+            // Добавляем комментарий, что товары должны быть настроены в VK
+            const commentDiv = document.createElement('div');
+            commentDiv.className = 'text-xs text-gray-400 mb-4 p-2 bg-gray-900 rounded-lg';
+            commentDiv.innerHTML = '<b>Внимание:</b> Товары (например, <code>level_skip_1</code>, <code>level_skip_2</code>) и их цены в "голосах" должны быть настроены в <a href="https://vk.com/apps?act=manage" target="_blank" class="text-blue-400 underline">панели управления приложением VK</a>.';
+            container.appendChild(commentDiv);
+
             LEVELS.forEach((level, index) => {
                 if (index === 0) return; // Don't show the first level
+
+                const vkItemName = `level_skip_${index}`; // Уникальное имя товара для VK
                 const isUnlocked = gameState.currentLevelIndex >= index;
-                const canAfford = gameState.enlightenmentPoints >= level.epRequired;
+                
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'bg-gray-900/50 p-3 rounded-lg flex items-center justify-between';
+                
                 let buttonHtml = isUnlocked
                     ? `<button class="bg-gray-600 text-gray-400 text-sm font-bold py-2 px-4 rounded-lg cursor-not-allowed">Достигнут</button>`
-                    : `<button onclick="buyLevel(${index}, this)" class="${canAfford ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-700 text-gray-400 cursor-not-allowed'} text-white text-sm font-bold py-2 px-4 rounded-lg transition">Купить</button>`;
-                itemDiv.innerHTML = `<div><h4 class="font-bold text-purple-300">${level.name}</h4><p class="text-sm font-bold text-yellow-400">${level.epRequired} ЕП™</p></div>${buttonHtml}`;
+                    // Кнопка теперь вызывает buyLevelWithVotes
+                    : `<button onclick="buyLevelWithVotes(${index}, '${vkItemName}')" class="bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition">Купить</button>`;
+                
+                itemDiv.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-purple-300">${level.name}</h4>
+                        <p class="text-xs text-gray-400">Мгновенно достичь уровня</p>
+                    </div>
+                    ${buttonHtml}`;
                 container.appendChild(itemDiv);
             });
             openModal('shop-modal');
         }
 
-        function buyLevel(levelIndex, buttonElement) {
+        // Новая асинхронная функция для покупки за голоса
+        async function buyLevelWithVotes(levelIndex, vkItemName) {
             const level = LEVELS[levelIndex];
-            if (!level || gameState.currentLevelIndex >= levelIndex) return;
-            if (gameState.enlightenmentPoints >= level.epRequired) {
-                gameState.enlightenmentPoints = level.epRequired;
-                gameState.currentLevelIndex = levelIndex;
-                updateUI();
-                saveData();
-                closeModal('shop-modal');
-            } else {
-                buttonElement.classList.add('shake');
-                setTimeout(() => buttonElement.classList.remove('shake'), 300);
+            if (!level || gameState.currentLevelIndex >= levelIndex) {
+                console.warn('Level already unlocked or invalid.');
+                return;
+            }
+
+            try {
+                // Показываем окно покупки VK
+                console.log(`Attempting to purchase: ${vkItemName}`);
+                const data = await vkBridge.send('VKWebAppShowOrderBox', {
+                    type: 'item',
+                    item: vkItemName
+                });
+
+                // Проверяем успешность оплаты
+                // data.success используется в старых версиях, data.status - в новых
+                if (data.status === 'paid' || data.success === true) {
+                    // Оплата прошла, обновляем состояние игры
+                    console.log(`Purchase successful for item: ${vkItemName}`);
+                    gameState.currentLevelIndex = levelIndex;
+                    // Синхронизируем ЕП с новым уровнем, чтобы прогресс-бар был полным
+                    gameState.enlightenmentPoints = level.epRequired; 
+                    updateUI();
+                    await saveData();
+                    closeModal('shop-modal');
+                } else {
+                    // Пользователь отменил или произошла ошибка
+                    console.warn('Purchase was not successful:', data);
+                }
+            } catch (error) {
+                // Ошибка вызова VK Bridge
+                console.error('VKWebAppShowOrderBox error:', error);
+                // Здесь можно показать кастомное сообщение об ошибке
             }
         }
 
@@ -421,6 +463,35 @@
             await loadData();
             showBannerAd();
 
+            // --- Handle Notification Permission Request ---
+            // Убедимся, что счетчик является числом (для старых пользователей)
+            if (typeof gameState.notificationAskAttempts !== 'number') {
+                gameState.notificationAskAttempts = 0;
+            }
+
+            // Запрашиваем разрешение только если < 2 попыток
+            if (gameState.notificationAskAttempts < 2) {
+                try {
+                    // 1. Проверяем, есть ли уже разрешение
+                    const check = await vkBridge.send('VKWebAppCheckAllowedNotifications');
+                    if (!check.result) {
+                        // 2. Разрешения нет. Запрашиваем.
+                        try {
+                            await vkBridge.send('VKWebAppAllowNotifications');
+                        } finally {
+                            // 3. Увеличиваем счетчик и сохраняем.
+                            // Это выполнится независимо от того,
+                            // нажал пользователь "Разрешить" или "Запретить".
+                            gameState.notificationAskAttempts++;
+                            await saveData();
+                        }
+                    }
+                } catch (e) {
+                    console.error('Notification permission flow error:', e);
+                }
+            }
+            // --- End Notification Logic ---
+
             enlightenButton.addEventListener('click', showRewardedAd);
             uselessClickerBtn.addEventListener('click', handleUselessClick);
             journalButton.addEventListener('click', () => openModal('journal-modal'));
@@ -441,3 +512,5 @@
     </script>
 </body>
 </html>
+
+
